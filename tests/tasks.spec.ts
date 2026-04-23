@@ -15,7 +15,7 @@ test('Deve poder cadastrar uma nova tarefa', async ({page, request}) => {
     await page.click('css=button >> text=Create')
     
     // Então essa tarefa deve ser exibida na lista
-    const target = page.getByTestId('task-item')
+    const target = page.locator(`css=.task-item p >> text=${taskName}`)
     await expect(target).toHaveText(taskName)
 
     //await page.click('xpath=//button[contains(text(), "Create")]') enviando formulário com xpath
