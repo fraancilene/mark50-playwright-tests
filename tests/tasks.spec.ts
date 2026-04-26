@@ -1,12 +1,16 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 import { TaskModel } from './fixtures/task.model'
 import { deleteTaskByHelper, createTask } from './support/helpers'
+import { TasksPage } from './support/pages/tasks'
 
 
 
 test('Deve poder cadastrar uma nova tarefa', async ({ page, request }) => {
 
-        const task: TaskModel = {
+    const tasksPage: TasksPage = new TasksPage(page)
+
+
+    const task: TaskModel = {
         name: 'Ler um livro de TypeScript',
         is_done: false
     }
@@ -16,19 +20,20 @@ test('Deve poder cadastrar uma nova tarefa', async ({ page, request }) => {
   
     
     // E que estou na página de cadastro
-    await page.goto('http://localhost:8080')
+    await tasksPage.go()
 
     // Quando faço o cadastro dessa tarefa
-    const inputTaskName = page.locator('input[class*=InputNewTask]') //definição de um objeto
-    await inputTaskName.fill(task.name)
-    await page.click('css=button >> text=Create')
+    await tasksPage.create(task)
     
     // Então essa tarefa deve ser exibida na lista
-    const target = page.locator(`css=.task-item p >> text=${task.name}`)
-    await expect(target).toBeVisible()
+    await tasksPage.shouldHaveText(task.name)
+
 })
 
 test('Não deve permitir tarefa duplicada', async ({page, request})=> {
+    const tasksPage: TasksPage = new TasksPage(page)
+
+
     const task: TaskModel = {
         name: 'Comprar Ketchup',
         is_done: false
@@ -37,13 +42,11 @@ test('Não deve permitir tarefa duplicada', async ({page, request})=> {
     await deleteTaskByHelper(request, task.name)
     await createTask(request, task)
 
-    await page.goto('http://localhost:8080')
-    const inputTaskName = page.locator('input[class*=InputNewTask]') //definição de um objeto
-    await inputTaskName.fill(task.name)
-    await page.click('css=button >> text=Create')
+       // E que estou na página de cadastro
+    await tasksPage.go()
 
-    const target = page.locator('.swal2-html-container')
-    await expect(target).toHaveText('Task already exists!')
-
+    // Quando faço o cadastro dessa tarefa
+    await tasksPage.create(task)
+    await tasksPage.alertHaveText('Task already exists!')
 
 })
