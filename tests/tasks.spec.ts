@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { TaskModel } from './fixtures/task.model'
 import { deleteTaskByHelper, createTask } from './support/helpers'
 import { TasksPage } from './support/pages/tasks'
@@ -32,8 +32,6 @@ test('Deve poder cadastrar uma nova tarefa', async ({ page, request }) => {
 
 test('Não deve permitir tarefa duplicada', async ({page, request})=> {
     const tasksPage: TasksPage = new TasksPage(page)
-
-
     const task: TaskModel = {
         name: 'Comprar Ketchup',
         is_done: false
@@ -48,5 +46,21 @@ test('Não deve permitir tarefa duplicada', async ({page, request})=> {
     // Quando faço o cadastro dessa tarefa
     await tasksPage.create(task)
     await tasksPage.alertHaveText('Task already exists!')
+
+})
+
+test('Campo Obrigatório', async ({ page }) => {
+    const task: TaskModel = {
+        name: '',
+        is_done: false
+    }
+
+    const tasksPage: TasksPage = new TasksPage(page)
+    await tasksPage.go()
+    await tasksPage.create(task)
+
+    // validação explicita recomendada nesse caso
+    const validationMessage = await tasksPage.inputTaskname.evaluate (e => (e as HTMLInputElement).validationMessage)
+    expect(validationMessage).toEqual('This is a required field')
 
 })
