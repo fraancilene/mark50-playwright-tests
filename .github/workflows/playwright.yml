@@ -20,13 +20,24 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: yarn install --frozen-lockfile
+
+      - name: Install api dependencies
+        working-directory: apps/api
         run: yarn install --frozen-lockfile
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        env:
+          BASE_URL: http://localhost:3000
+          BASE_API: http://localhost:3333
         run: npx playwright test
       
       - uses: actions/upload-artifact@v4
@@ -35,4 +46,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
