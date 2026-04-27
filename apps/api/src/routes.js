@@ -7,6 +7,9 @@ require('dotenv').config();
 var router = express_1.Router();
 exports.router = router;
 var taskController = new TaskController_1.TaskController();
+router.get("/health", function (_request, response) {
+    return response.status(200).json({ status: "ok" });
+});
 router.post("/tasks", taskController.create);
 router.get("/tasks", taskController.show);
 router.delete("/tasks/:id", taskController.remove);

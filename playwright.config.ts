@@ -3,6 +3,7 @@ import 'dotenv/config'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const BASE_API = process.env.BASE_API || 'http://localhost:3333';
+const BASE_API_HEALTHCHECK = `${BASE_API}/health`;
 
 /**
  * Read environment variables from file.
@@ -87,7 +88,7 @@ export default defineConfig({
     },
     {
       command: 'yarn dev',
-      url: BASE_API,
+      url: BASE_API_HEALTHCHECK,
       reuseExistingServer: !process.env.CI,
       cwd: './apps/api',
       timeout: 120 * 1000,
