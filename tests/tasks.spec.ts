@@ -4,11 +4,14 @@ import { deleteTaskByHelper, createTask } from "./support/helpers";
 import { TasksPage } from "./support/pages/tasks";
 import data from "./fixtures/tasks.json";
 
-test.describe("Cadastro de Tasks", () => {
-  test("Deve poder cadastrar uma nova tarefa", async ({ page, request }) => {
-    const task = data.success as TaskModel;
-    const tasksPage: TasksPage = new TasksPage(page);
+let tasksPage: TasksPage;
+test.beforeEach(({ page }) => {
+  tasksPage = new TasksPage(page);
+});
 
+test.describe("Cadastro de Tasks", () => {
+  test("Deve poder cadastrar uma nova tarefa", async ({ request }) => {
+    const task = data.success as TaskModel;
     // Dado que eu tenho uma nova tarefa
     await deleteTaskByHelper(request, task.name);
 
@@ -22,10 +25,8 @@ test.describe("Cadastro de Tasks", () => {
     await tasksPage.shouldHaveText(task.name);
   });
 
-  test("Não deve permitir tarefa duplicada", async ({ page, request }) => {
+  test("Não deve permitir tarefa duplicada", async ({ request }) => {
     const task = data.duplicate as TaskModel;
-
-    const tasksPage: TasksPage = new TasksPage(page);
 
     await deleteTaskByHelper(request, task.name);
     await createTask(request, task);
@@ -38,10 +39,8 @@ test.describe("Cadastro de Tasks", () => {
     await tasksPage.alertHaveText("Task already exists!");
   });
 
-  test("Campo Obrigatório", async ({ page }) => {
+  test("Campo Obrigatório", async () => {
     const task = data.required as TaskModel;
-
-    const tasksPage: TasksPage = new TasksPage(page);
     await tasksPage.go();
     await tasksPage.create(task);
 
@@ -54,13 +53,11 @@ test.describe("Cadastro de Tasks", () => {
 });
 
 test.describe("Atualização de tasks", () => {
-  test("Deve concluir uma tarefa", async ({ page, request }) => {
+  test("Deve concluir uma tarefa", async ({ request }) => {
     const task = data.update as TaskModel;
 
     await deleteTaskByHelper(request, task.name);
     await createTask(request, task);
-
-    const tasksPage: TasksPage = new TasksPage(page);
     await tasksPage.go();
     await tasksPage.toggle(task.name);
     await tasksPage.shouldBeDone(task.name);
@@ -68,13 +65,11 @@ test.describe("Atualização de tasks", () => {
 });
 
 test.describe("Exclusão de task", () => {
-  test.only("Deve concluir uma tarefa", async ({ page, request }) => {
+  test("Deve concluir uma tarefa", async ({ request }) => {
     const task = data.delete as TaskModel;
 
     await deleteTaskByHelper(request, task.name);
     await createTask(request, task);
-
-    const tasksPage: TasksPage = new TasksPage(page);
     await tasksPage.go();
 
     await tasksPage.remove(task.name);
