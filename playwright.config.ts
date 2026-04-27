@@ -78,20 +78,22 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-      command: 'yarn dev',
-      url: BASE_URL,
-      reuseExistingServer: !process.env.CI,
-      cwd: './apps/web',
-      timeout: 120 * 1000,
-    },
-    {
-      command: 'yarn dev',
-      url: BASE_API_HEALTHCHECK,
-      reuseExistingServer: !process.env.CI,
-      cwd: './apps/api',
-      timeout: 120 * 1000,
-    },
-  ],
+  webServer: process.env.CI
+    ? undefined
+    : [
+        {
+          command: 'yarn dev',
+          url: BASE_URL,
+          reuseExistingServer: true,
+          cwd: './apps/web',
+          timeout: 120 * 1000,
+        },
+        {
+          command: 'yarn dev',
+          url: BASE_API_HEALTHCHECK,
+          reuseExistingServer: true,
+          cwd: './apps/api',
+          timeout: 120 * 1000,
+        },
+      ],
 });
